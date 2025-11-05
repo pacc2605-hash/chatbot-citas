@@ -1,23 +1,24 @@
 import express from "express";
 import bodyParser from "body-parser";
 import twilio from "twilio";
-import dotenv from "dotenv";
 import admin from "firebase-admin";
 
-dotenv.config();
+// --- Inicializar Express ---
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// --- Firebase ---
-import fs from "fs";
-const serviceAccount = JSON.parse(fs.readFileSync("./serviceAccountKey.json", "utf8"));
+// --- Firebase usando variable de entorno ---
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
+  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY)),
 });
 const db = admin.firestore();
 
-// --- Twilio ---
+// --- Twilio usando variables de entorno ---
 const { MessagingResponse } = twilio.twiml;
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
 
 // =====================
 // DATOS BASE (mock)
@@ -215,5 +216,6 @@ app.post("/whatsapp", async (req, res) => {
   res.end(twiml.toString());
 });
 
+// --- Puerto ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor WhatsApp en puerto ${PORT}`));
