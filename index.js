@@ -8,8 +8,9 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // --- Firebase usando variable de entorno ---
+const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_KEY)),
+  credential: admin.credential.cert(serviceAccount),
 });
 const db = admin.firestore();
 
@@ -19,6 +20,7 @@ const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
+const TWILIO_NUMBER = process.env.TWILIO_NUMBER;
 
 // =====================
 // DATOS BASE (mock)
@@ -217,5 +219,4 @@ app.post("/whatsapp", async (req, res) => {
 });
 
 // --- Puerto ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Servidor WhatsApp en puerto ${PORT}`));
+const PORT = process.env
